@@ -9,19 +9,18 @@ function CalendarGrid({ days, onDayClick, events, onEventMove }) {
 
   return (
     <div className="calendar-grid">
-      {/* Render day names (headers) */}
+      
       {dayNames.map((dayName) => (
         <div key={dayName} className="calendar-day-header">
           {dayName}
         </div>
       ))}
 
-      {/* Render calendar days */}
+
       {days.map((day) => {
         const dayKey = day.toISOString().split("T")[0];
         const dayEvents = events[dayKey] || [];
-        const today = isToday(day); // Check if this day is today
-
+        const today = isToday(day); 
         return (
           <Day
             key={dayKey}
@@ -29,7 +28,7 @@ function CalendarGrid({ days, onDayClick, events, onEventMove }) {
             events={dayEvents}
             onDayClick={onDayClick}
             onEventMove={onEventMove}
-            isToday={today} // Pass whether this is today
+            isToday={today} 
           />
         );
       })}
@@ -48,8 +47,8 @@ const Day = React.memo(({ day, events, onDayClick, onEventMove, isToday }) => {
   return (
     <div
       ref={drop}
-      className={`calendar-day ${isToday ? "highlight-today" : ""}`} // Highlight today
-      onClick={() => onDayClick(day)} // Call onDayClick when this day is clicked
+      className={`calendar-day ${isToday ? "highlight-today" : ""}`} 
+      onClick={() => onDayClick(day)}
     >
       <div className="day-number">{day.getDate()}</div>
       <div className="events">

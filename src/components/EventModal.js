@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const EventModal = ({ day, onSave, onClose, editingEvent }) => {
@@ -14,21 +13,31 @@ const EventModal = ({ day, onSave, onClose, editingEvent }) => {
       setEventDescription(editingEvent.event.eventDescription);
       setStartTime(editingEvent.event.startTime);
       setEndTime(editingEvent.event.endTime);
+    } else {
+      setEventName("");
+      setEventDescription("");
+      setStartTime("");
+      setEndTime("");
     }
   }, [editingEvent]);
 
   const handleSubmit = () => {
+    if (!eventName || !eventDescription || !startTime || !endTime) {
+      alert("Event Name, Description, and Time are required!");
+      return;
+    }
+
+    if (startTime >= endTime) {
+      alert("End time must be later than start time.");
+      return;
+    }
+
     const eventData = {
       eventName,
       eventDescription,
       startTime,
       endTime,
     };
-
-    if (!eventName || !eventDescription || !startTime || !endTime) {
-      alert("Event Name, Description, and Time are required!");
-      return;
-    }
 
     onSave(eventData, editingEvent ? editingEvent.index : null);
     onClose();
@@ -38,7 +47,9 @@ const EventModal = ({ day, onSave, onClose, editingEvent }) => {
     <div className="modal">
       <div className="event-modal-header">
         <h3>{editingEvent ? "Edit Event" : "Create Event"}</h3>
-        <button className="close-btn" onClick={onClose}>&times;</button>
+        <button className="close-btn" onClick={onClose}>
+          &times;
+        </button>
       </div>
       <input
         type="text"
@@ -63,7 +74,9 @@ const EventModal = ({ day, onSave, onClose, editingEvent }) => {
         value={endTime}
         onChange={(e) => setEndTime(e.target.value)}
       />
-      <button onClick={handleSubmit}>{editingEvent ? "Save Changes" : "Create Event"}</button>
+      <button onClick={handleSubmit}>
+        {editingEvent ? "Save Changes" : "Create Event"}
+      </button>
     </div>
   );
 };

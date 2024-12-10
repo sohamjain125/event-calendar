@@ -8,8 +8,6 @@ import { useDrag, useDrop } from "react-dnd";
 import Header from "./components/Header.js";
 
 function App() {
-
-  
   const [currentDate, setCurrentDate] = useState(new Date());
   const { days, nextMonth, prevMonth, currentMonth } = useCalendar(currentDate);
   const [editingEvent, setEditingEvent] = useState(null);
@@ -19,15 +17,6 @@ function App() {
     const savedEvents = localStorage.getItem("events");
     return savedEvents ? JSON.parse(savedEvents) : {};
   });
-  const isToday = (day) => {
-    const today = new Date();
-    return (
-      day.getDate() === today.getDate() &&
-      day.getMonth() === today.getMonth() &&
-      day.getFullYear() === today.getFullYear()
-    );
-  };
-  
 
   const [selectedDay, setSelectedDay] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -44,55 +33,60 @@ function App() {
     },
     {}
   );
+
   const saveEventsToStorage = (updatedEvents) => {
     setEvents(updatedEvents);
     localStorage.setItem("events", JSON.stringify(updatedEvents));
   };
 
   const handleDayClick = (day) => {
-    console.log("Day clicked:", day);
     try {
       if (!(day instanceof Date)) {
         console.error("Invalid Date object:", day);
         return;
       }
-  
-      // Extract month, year, and date from the Date object
+
       const monthNames = [
-        "January", "February", "March", "April", "May", "June", "July",
-        "August", "September", "October", "November", "December"
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
       ];
-  
+
       const month = monthNames[day.getMonth()];
       const year = day.getFullYear();
       const date = day.getDate();
-  
-      // Ensure the date is valid
+
       if (!month || !year || !date) {
         console.error("Invalid day object:", day);
         return;
       }
-  
-      // Format the date string
-      const dateString = `${year}-${(day.getMonth() + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
+
+      const dateString = `${year}-${(day.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${date.toString().padStart(2, "0")}`;
       const newSelectedDay = new Date(dateString);
-  
+
       if (isNaN(newSelectedDay)) {
         console.error("Invalid Date:", newSelectedDay);
         return;
       }
-  
+
       setSelectedDay(newSelectedDay);
+      console.log("Selected Day:", newSelectedDay);
       setModalOpen(true);
     } catch (error) {
       console.error("Error processing day click:", error);
     }
   };
-  
-
-  useEffect(() => {
-    console.log("selectedDay updated:", selectedDay, typeof selectedDay);
-  }, [selectedDay]);
 
   const isOverlapping = (newEvent, dayEvents) => {
     return dayEvents.some(
@@ -123,18 +117,19 @@ function App() {
 
   const handleEventMove = (originalDate, newDate, event) => {
     const updatedEvents = { ...events };
-  
+
     const originalDateKey = originalDate.toISOString().split("T")[0];
     const newDateKey = newDate.toISOString().split("T")[0];
-  
+
     updatedEvents[originalDateKey] = updatedEvents[originalDateKey].filter(
       (e) => e !== event
     );
     if (!updatedEvents[newDateKey]) updatedEvents[newDateKey] = [];
     updatedEvents[newDateKey].push(event);
-  
+
     saveEventsToStorage(updatedEvents);
   };
+
   const handleExportEvents = () => {
     const blob = new Blob([JSON.stringify(events, null, 2)], {
       type: "application/json",
@@ -145,6 +140,7 @@ function App() {
     link.download = "events.json";
     link.click();
   };
+
   const handleImportEvents = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -162,22 +158,25 @@ function App() {
     };
     reader.readAsText(file);
   };
+
   const handleDeleteEvent = (eventIndex) => {
     if (!selectedDay || !(selectedDay instanceof Date)) {
       console.error("Invalid selectedDay:", selectedDay);
       return;
     }
 
-    const dateKey = selectedDay.toISOString().split("T")[0];
+    const dateKey = selectedDay.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
     const updatedEvents = { ...events };
 
+    // Remove the event from the array
     updatedEvents[dateKey].splice(eventIndex, 1);
 
+    // If there are no events left for the selected day, delete the entry
     if (updatedEvents[dateKey].length === 0) {
       delete updatedEvents[dateKey];
     }
 
-    saveEventsToStorage(updatedEvents);
+    saveEventsToStorage(updatedEvents); // Save the updated events to localStorage
   };
 
   const handleEditEvent = (eventIndex) => {
@@ -195,7 +194,7 @@ function App() {
 
   return (
     <div>
-      <Header /> 
+      <Header />
       <h1>{currentMonth}</h1>
       <input
         type="text"
@@ -211,7 +210,7 @@ function App() {
       <CalendarGrid
         days={days}
         onDayClick={handleDayClick}
-        events={filteredEvents} // Pass filtered events here
+        events={filteredEvents}
         onEventMove={handleEventMove}
       />
 
@@ -221,17 +220,20 @@ function App() {
           onSave={handleSaveEvent}
           onClose={() => {
             setModalOpen(false);
-            setEditingEvent(null); // Reset editing state when modal is closed
+            setEditingEvent(null);
           }}
           editingEvent={editingEvent}
         >
-          <EventList
-            events={events[selectedDay.toISOString().split("T")[0]] || []} // Ensure events is always an array
-            onEdit={handleEditEvent}
-            onDelete={handleDeleteEvent}
-          />
+          
+          
         </EventModal>
+        
       )}
+      <EventList
+            events={events[selectedDay?.toISOString().split("T")[0]] || []}
+            onEdit={handleEditEvent}
+            onDelete={handleDeleteEvent} // Pass handleDeleteEvent as onDelete prop
+          />
     </div>
   );
 }
