@@ -39,55 +39,74 @@ function App() {
     localStorage.setItem("events", JSON.stringify(updatedEvents));
   };
 
+  // const handleDayClick = (day) => {
+  //   try {
+  //     if (!(day instanceof Date)) {
+  //       console.error("Invalid Date object:", day);
+  //       return;
+  //     }
+
+  //     const monthNames = [
+  //       "January",
+  //       "February",
+  //       "March",
+  //       "April",
+  //       "May",
+  //       "June",
+  //       "July",
+  //       "August",
+  //       "September",
+  //       "October",
+  //       "November",
+  //       "December",
+  //     ];
+
+  //     const month = monthNames[day.getMonth()];
+  //     const year = day.getFullYear();
+  //     const date = day.getDate();
+
+  //     if (!month || !year || !date) {
+  //       console.error("Invalid day object:", day);
+  //       return;
+  //     }
+
+  //     const dateString = `${year}-${(day.getMonth() + 1)
+  //       .toString()
+  //       .padStart(2, "0")}-${date.toString().padStart(2, "0")}`;
+  //     const newSelectedDay = new Date(dateString);
+
+  //     if (isNaN(newSelectedDay)) {
+  //       console.error("Invalid Date:", newSelectedDay);
+  //       return;
+  //     }
+
+  //     setSelectedDay(newSelectedDay);
+  //     console.log("Selected Day:", newSelectedDay);
+  //     setModalOpen(true);
+  //   } catch (error) {
+  //     console.error("Error processing day click:", error);
+  //   }
+  // };
+
   const handleDayClick = (day) => {
     try {
       if (!(day instanceof Date)) {
         console.error("Invalid Date object:", day);
         return;
       }
-
-      const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
-
-      const month = monthNames[day.getMonth()];
-      const year = day.getFullYear();
-      const date = day.getDate();
-
-      if (!month || !year || !date) {
-        console.error("Invalid day object:", day);
-        return;
-      }
-
-      const dateString = `${year}-${(day.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}-${date.toString().padStart(2, "0")}`;
-      const newSelectedDay = new Date(dateString);
-
-      if (isNaN(newSelectedDay)) {
-        console.error("Invalid Date:", newSelectedDay);
-        return;
-      }
-
-      setSelectedDay(newSelectedDay);
-      console.log("Selected Day:", newSelectedDay);
+  
+      // Normalize the date to remove time part (set to midnight local time)
+      const normalizedDate = new Date(day);
+      normalizedDate.setHours(0, 0, 0, 0); // Set to midnight of the selected day
+  
+      setSelectedDay(normalizedDate);
+      console.log("Selected Day:", normalizedDate);
       setModalOpen(true);
     } catch (error) {
       console.error("Error processing day click:", error);
     }
   };
-
+  
   const isOverlapping = (newEvent, dayEvents) => {
     return dayEvents.some(
       (event) =>
